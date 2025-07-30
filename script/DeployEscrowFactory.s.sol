@@ -14,24 +14,29 @@ import { console } from "forge-std/console.sol";
 contract DeployEscrowFactory is Script {
     uint32 public constant RESCUE_DELAY = 691200; // 8 days
 
+    // Chain IDs
+    uint256 public constant SEPOLIA_CHAIN_ID = 11155111;
+    uint256 public constant MONAD_TESTNET_CHAIN_ID = 10143;
+
     // Sepolia Testnet Addresses
-    address public constant LOP_SEPOLIA = 0x111111125421cA6dc452d289314280a0f8842A65; // Same on all chains
     address public constant FEE_TOKEN_SEPOLIA = 0x7a627931A433A1155459344d99a67A245582390F; // A DAI-like token on Sepolia
     address public constant ACCESS_TOKEN_SEPOLIA = 0xACCe550000159e70908C0499a1119D04e7039C28; // Same on all chains
 
     function run() external {
         uint256 chainId = block.chainid;
         address deployer = vm.envAddress("DEPLOYER_ADDRESS");
+        address lopAddress;
 
         vm.startBroadcast();
 
-        if (chainId == 11155111) {
+        if (chainId == SEPOLIA_CHAIN_ID) {
             // Sepolia Deployment
-            console.log("Deploying to Sepolia (Chain ID 11155111)...");
+            console.log("Deploying to Sepolia (Chain ID %s)...", chainId);
+            lopAddress = vm.envAddress("LOP_SEPOLIA");
+            require(lopAddress != address(0), "LOP_SEPOLIA environment variable not set");
 
-            // The CREATE3_DEPLOYER doesn't exist on Sepolia, so we use a direct deployment.
             EscrowFactory escrowFactory = new EscrowFactory(
-                LOP_SEPOLIA,
+                lopAddress,
                 IERC20(FEE_TOKEN_SEPOLIA),
                 IERC20(ACCESS_TOKEN_SEPOLIA),
                 deployer, // feeBankOwner
@@ -43,16 +48,22 @@ contract DeployEscrowFactory is Script {
             // Custom Chain Deployment
             console.log("Deploying to custom chain ID:", chainId);
 
+            if (chainId == MONAD_TESTNET_CHAIN_ID) {
+                lopAddress = vm.envAddress("LOP_MONAD_TESTNET");
+                require(lopAddress != address(0), "LOP_MONAD_TESTNET environment variable not set");
+            } else {
+                lopAddress = vm.envAddress("LOP_CUSTOM");
+                require(lopAddress != address(0), "LOP_CUSTOM environment variable not set");
+            }
+
             ERC20True accessToken = new ERC20True();
             console.log("Mock Access Token deployed at: ", address(accessToken));
 
             ERC20True feeToken = new ERC20True();
             console.log("Mock Fee Token deployed at: ", address(feeToken));
 
-            address lop_placeholder = deployer;
-
             EscrowFactory escrowFactory = new EscrowFactory(
-                lop_placeholder,
+                lopAddress,
                 IERC20(address(feeToken)),
                 IERC20(address(accessToken)),
                 deployer, // feeBankOwner

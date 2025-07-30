@@ -3,6 +3,8 @@
 
 # This script deploys the EscrowFactory to both a custom chain (e.g., Monad)
 # and the Ethereum Sepolia testnet using the same deployer account.
+#
+# For custom chain deployment, ensure either LOP_CUSTOM or LOP_MONAD_TESTNET is set.
 
 # --- Configuration ---
 # Ensure these environment variables are set in your shell or a .env file:
@@ -18,8 +20,8 @@ fi
 echo "▶️  Starting deployments..."
 
 # Validate that necessary variables are set
-if [[ -z "$CUSTOM_RPC_URL" || -z "$SEPOLIA_RPC_URL" || -z "$DEPLOYER_PRIVATE_KEY" || -z "$DEPLOYER_ADDRESS" ]]; then
-  echo "❌ Error: Please set all required environment variables: CUSTOM_RPC_URL, SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, DEPLOYER_ADDRESS."
+if [[ -z "$CUSTOM_RPC_URL" || -z "$SEPOLIA_RPC_URL" || -z "$DEPLOYER_PRIVATE_KEY" || -z "$DEPLOYER_ADDRESS" || -z "$LOP_SEPOLIA" ]]; then
+  echo "❌ Error: Please set all required environment variables: CUSTOM_RPC_URL, SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, DEPLOYER_ADDRESS, LOP_SEPOLIA."
   exit 1
 fi
 
