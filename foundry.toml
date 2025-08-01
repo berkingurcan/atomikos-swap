@@ -33,3 +33,11 @@ libs = ['lib']
 fallback_oz = true
 is_system = false
 mode = "3"
+
+# Network configurations
+[rpc_endpoints]
+sepolia = "https://ethereum-sepolia-rpc.publicnode.com"
+monad_testnet = "https://rpc.ankr.com/monad_testnet"
+
+# Contract verification can be done manually if needed
+# Monad testnet doesn't have block explorer verification yet
